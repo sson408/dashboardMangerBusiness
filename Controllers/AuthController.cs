@@ -29,7 +29,7 @@ namespace dashboardManger.Controllers
         {
             if (_context.Users.Any(u => u.Username == request.Username))
             {
-                return BadRequest("Username already exists");
+                return BadRequest(new ApiResponse<string>(400, "Username already exists", null));
             }
 
             var user = new User
@@ -42,7 +42,7 @@ namespace dashboardManger.Controllers
             _context.Users.Add(user);
             _context.SaveChanges();
 
-            return Ok("User registered successfully");
+            return Ok(new ApiResponse<string>(200, "User registered successfully", null));
         }
 
         [HttpPost("login")]
@@ -51,14 +51,20 @@ namespace dashboardManger.Controllers
             var user = _context.Users.SingleOrDefault(u => u.Username == request.Username);
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
             {
-                return Unauthorized("Invalid username or password");
+                return Unauthorized(new ApiResponse<string>(401, "Invalid username or password", null));
             }
 
             var token = GenerateJwtToken(user.Username);
             var refreshToken = GenerateRefreshToken();
             refreshTokens.Add(refreshToken);
 
-            return Ok(new { token, refreshToken = refreshToken.Token });
+            var response = new
+            {
+                Token = token,
+                RefreshToken = refreshToken.Token
+            };
+
+            return Ok(new ApiResponse<object>(200, "Login successful", response));
         }
 
         [HttpPost("refresh")]
@@ -69,14 +75,22 @@ namespace dashboardManger.Controllers
             var savedRefreshToken = refreshTokens.SingleOrDefault(rt => rt.Token == tokenRequest.RefreshToken);
 
             if (savedRefreshToken == null || savedRefreshToken.ExpiryDate <= DateTime.UtcNow)
-                return Unauthorized();
+            {
+                return Unauthorized(new ApiResponse<string>(401, "Invalid refresh token", null));
+            }
 
             var newJwtToken = GenerateJwtToken(username);
             var newRefreshToken = GenerateRefreshToken();
             refreshTokens.Remove(savedRefreshToken);
             refreshTokens.Add(newRefreshToken);
 
-            return Ok(new { token = newJwtToken, refreshToken = newRefreshToken.Token });
+            var response = new
+            {
+                Token = newJwtToken,
+                RefreshToken = newRefreshToken.Token
+            };
+
+            return Ok(new ApiResponse<object>(200, "Token refreshed successfully", response));
         }
 
         private string GenerateJwtToken(string username)
@@ -121,7 +135,7 @@ namespace dashboardManger.Controllers
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidateIssuerSigningKey = true,
-                ValidateLifetime = false, // 这里我们不验证令牌的过期时间
+                ValidateLifetime = false, 
                 ValidIssuer = jwtSettings["Issuer"],
                 ValidAudience = jwtSettings["Audience"],
                 IssuerSigningKey = new SymmetricSecurityKey(key)
