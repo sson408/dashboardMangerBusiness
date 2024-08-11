@@ -2,16 +2,15 @@
 {
     public class ApiResponse<T>
     {
-        public int StatusCode { get; set; }
+        public int Code { get; set; }
         public string Message { get; set; }
         public T Data { get; set; }
 
-        public ApiResponse(int statusCode, string message, T data)
+        public ApiResponse(int code, string msg, T data)
         {
-            StatusCode = statusCode;
-            Message = message;
+            Code = code;
+            Message = msg;
             Data = data;
         }
     }
-
 }

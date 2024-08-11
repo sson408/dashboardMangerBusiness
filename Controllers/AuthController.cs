@@ -7,7 +7,6 @@ using dashboardManger.Data;
 using dashboardManger.Models;
 using System.Security.Cryptography;
 
-
 namespace dashboardManger.Controllers
 {
     [Route("api/[controller]")]
@@ -130,12 +129,13 @@ namespace dashboardManger.Controllers
             var jwtSettings = _configuration.GetSection("Jwt");
             var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]);
 
+            var test = jwtSettings["Audience"];
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidateIssuerSigningKey = true,
-                ValidateLifetime = false, 
+                ValidateLifetime = false,
                 ValidIssuer = jwtSettings["Issuer"],
                 ValidAudience = jwtSettings["Audience"],
                 IssuerSigningKey = new SymmetricSecurityKey(key)
@@ -150,10 +150,7 @@ namespace dashboardManger.Controllers
 
             return principal;
         }
-
     }
-
-
 
     public class UserRegister
     {
@@ -164,8 +161,8 @@ namespace dashboardManger.Controllers
 
     public class UserLogin
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public string? Username { get; set; }
+        public string? Password { get; set; }
     }
 
     public class TokenRequest
