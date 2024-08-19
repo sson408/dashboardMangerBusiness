@@ -6,6 +6,7 @@ namespace dashboardManger.Models
     {
         [Key]
         public int Id { get; set; }
+        public Guid Guid { get; set; } = Guid.NewGuid();
 
         [Required]
         [StringLength(50)]

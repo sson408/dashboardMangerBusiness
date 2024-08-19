@@ -53,7 +53,7 @@ namespace dashboardManger.Controllers
                 return Unauthorized(new ApiResponse<string>(401, "Invalid username or password", null));
             }
 
-            var token = GenerateJwtToken(user.Username);
+            var token = GenerateJwtToken(user.Username, user.Guid.ToString());
             var refreshToken = GenerateRefreshToken();
             refreshTokens.Add(refreshToken);
 
@@ -71,6 +71,7 @@ namespace dashboardManger.Controllers
         {
             var principal = GetPrincipalFromExpiredToken(tokenRequest.Token);
             var username = principal.Identity.Name;
+            var userGuid = principal.Claims.FirstOrDefault(c => c.Type == "Guid")?.Value;
             var savedRefreshToken = refreshTokens.SingleOrDefault(rt => rt.Token == tokenRequest.RefreshToken);
 
             if (savedRefreshToken == null || savedRefreshToken.ExpiryDate <= DateTime.UtcNow)
@@ -78,7 +79,7 @@ namespace dashboardManger.Controllers
                 return Unauthorized(new ApiResponse<string>(401, "Invalid refresh token", null));
             }
 
-            var newJwtToken = GenerateJwtToken(username);
+            var newJwtToken = GenerateJwtToken(username, userGuid);
             var newRefreshToken = GenerateRefreshToken();
             refreshTokens.Remove(savedRefreshToken);
             refreshTokens.Add(newRefreshToken);
@@ -92,7 +93,7 @@ namespace dashboardManger.Controllers
             return Ok(new ApiResponse<object>(200, "Token refreshed successfully", response));
         }
 
-        private string GenerateJwtToken(string username)
+        private string GenerateJwtToken(string username, string userGuid)
         {
             var jwtSettings = _configuration.GetSection("Jwt");
             var key = Encoding.ASCII.GetBytes(jwtSettings["Key"]);
@@ -101,7 +102,9 @@ namespace dashboardManger.Controllers
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                new Claim(ClaimTypes.Name, username)
+                new Claim(ClaimTypes.Name, username),
+                new Claim("Guid", userGuid)
+
             }),
                 Expires = DateTime.UtcNow.AddMinutes(double.Parse(jwtSettings["ExpiresInMinutes"])),
                 Issuer = jwtSettings["Issuer"],
