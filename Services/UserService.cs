@@ -3,21 +3,44 @@ using dashboardManger.Interfaces;
 using dashboardManger.Models;
 using System.Collections.Generic;
 using System.Linq;
+using dashboardManger.DTOs;
+using System.Security.Claims;
+using AutoMapper;
 
 namespace dashboardManger.Services
 {
     public class UserService : IUserService
     {
         private readonly MyDbContext _context;
+        private readonly IMapper _mapper;
 
-        public UserService(MyDbContext context)
+        public UserService(MyDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public IEnumerable<User> GetAllUsers()
         {
             return _context.Users.ToList();
+        }
+
+        public UserDTO GetCurrentUser(string userGuid)
+        {
+            if (string.IsNullOrEmpty(userGuid))
+            {
+                return null; 
+            }
+
+            var user = _context.Users.SingleOrDefault(u => u.Guid.ToString() == userGuid);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            // 将 User 实体映射为 UserDTO
+            return _mapper.Map<UserDTO>(user);
         }
 
         public User GetUserById(int id)

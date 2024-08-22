@@ -1,4 +1,5 @@
-﻿using dashboardManger.Models;
+﻿using dashboardManger.DTOs;
+using dashboardManger.Models;
 using System.Collections.Generic;
 
 namespace dashboardManger.Interfaces
@@ -7,6 +8,7 @@ namespace dashboardManger.Interfaces
     {
         IEnumerable<User> GetAllUsers();
         User GetUserById(int id);
+        UserDTO GetCurrentUser(string userGuid);
         void AddUser(User user);
         void UpdateUser(User user);
         void DeleteUser(int id);
