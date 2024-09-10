@@ -27,6 +27,14 @@ namespace dashboardManger.Data
                 .IsRequired()
                 .HasDefaultValueSql("NEWID()")
                 .HasColumnType("uniqueidentifier");
+
+            builder.Property(e => e.UserRoleId)
+                .IsRequired();
+
+            builder.Property(e => e.StateId)
+                .IsRequired();
+
+            builder.Property(e => e.DepartmentId);
         }
     }
 }

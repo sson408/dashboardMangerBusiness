@@ -18,5 +18,13 @@ namespace dashboardManger.Models
 
         [EmailAddress]
         public string? Email { get; set; }
+
+        [Required]
+        public int UserRoleId { get; set; }
+
+        [Required]
+        public int StateId { get; set; }
+
+        public int? DepartmentId { get; set; }
     }
 }

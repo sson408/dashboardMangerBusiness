@@ -64,6 +64,57 @@ namespace dashboardManger.Controllers
             return Ok(new ApiResponse<UserDTO>(200, "successfully", userDto));
         }
 
+
+        [HttpPost("listAll")]
+        public ActionResult<PagedApiResponse<UserDTO>> ListAll([FromBody] UserSearchSummary searchSummary, [FromQuery] int pageNum = 1, int pageSize = 10) {
+            try
+            {
+                var dataList = _context.Users.AsQueryable();
+
+                var totalItems = dataList.Count();
+                var users = dataList.Skip((pageNum - 1) * pageSize).Take(pageSize).ToList();
+
+                //map data
+                var userDtos = _mapper.Map<List<UserDTO>>(users);
+
+                //filter data
+                if (searchSummary != null) {
+                    if (searchSummary.StateId > 0) { 
+                        userDtos.RemoveAll(l => l.StateId != searchSummary.StateId);    
+                    }
+
+                    if (!string.IsNullOrEmpty(searchSummary.FilterWord))
+                    {
+                        //filter by username, email, department, state, userrole
+                        userDtos.RemoveAll(u => !u.UserName.Contains(searchSummary.FilterWord)
+                        && !u.Email.Contains(searchSummary.FilterWord)
+                        && !u.Department.Contains(searchSummary.FilterWord)
+                        && !u.State.Contains(searchSummary.FilterWord)
+                        && !u.UserRole.Contains(searchSummary.FilterWord));
+                    }
+                }
+
+                // Create pagination information
+                var pageInfo = new PageInfo
+                {
+                    PageNum = pageNum,
+                    PageSize = pageSize,
+                    Total = totalItems
+                };
+
+                var response = new PagedApiResponse<UserDTO>(200, "Success", pageInfo, userDtos);
+
+                return Ok(response);
+
+            }
+            catch (Exception ex) {
+                //return error message
+                return StatusCode(500, new ApiResponse<string>(500, "An error occurred while processing your request", null));
+            }
+
+        
+        }
+
         [HttpPost]
         public ActionResult<User> AddUser(User user)
         {
