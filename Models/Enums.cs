@@ -3,7 +3,7 @@
     public enum UserRole
     {
         Admin = 1,
-        User = 2  
+        Normal_User = 2  
     }
 
     public enum State

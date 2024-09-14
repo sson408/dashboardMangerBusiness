@@ -70,8 +70,8 @@ namespace dashboardManger.Controllers
             try
             {
                 var dataList = _context.Users.AsQueryable();
-
                 var totalItems = dataList.Count();
+
                 var users = dataList.Skip((pageNum - 1) * pageSize).Take(pageSize).ToList();
 
                 //map data
@@ -80,18 +80,20 @@ namespace dashboardManger.Controllers
                 //filter data
                 if (searchSummary != null) {
                     if (searchSummary.StateId > 0) { 
-                        userDtos.RemoveAll(l => l.StateId != searchSummary.StateId);    
+                        userDtos.RemoveAll(l => l.StateId != searchSummary.StateId);
+
+                        totalItems = userDtos.Count();
                     }
 
                     if (!string.IsNullOrEmpty(searchSummary.FilterWord))
                     {
-                        //filter by username, email, department, state, userrole
-                        userDtos.RemoveAll(u => !u.UserName.Contains(searchSummary.FilterWord)
-                        && !u.Email.Contains(searchSummary.FilterWord)
-                        && !u.Department.Contains(searchSummary.FilterWord)
-                        && !u.State.Contains(searchSummary.FilterWord)
-                        && !u.UserRole.Contains(searchSummary.FilterWord));
-                    }
+                        var filterWordList = searchSummary.FilterWord.ToLower().Split(' ');
+                        foreach (var word in filterWordList) {
+                            userDtos.RemoveAll(l => !l.FilterWord.Contains(word));
+                        }
+
+                        totalItems = userDtos.Count();
+                    }              
                 }
 
                 // Create pagination information

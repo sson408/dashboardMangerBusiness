@@ -1,4 +1,6 @@
-﻿namespace dashboardManger.DTOs
+﻿using System.Text.Json.Serialization;
+
+namespace dashboardManger.DTOs
 {
     public class UserDTO
     {      
@@ -11,6 +13,8 @@
         public string State { get; set; }
         public int DepartmentId { get; set; }
         public string Department { get; set; }
+        [JsonIgnore]
+        public string FilterWord { get; set; }
     }
 
     public class UserSearchSummary { 
