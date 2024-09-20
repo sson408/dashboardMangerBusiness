@@ -53,6 +53,10 @@ namespace dashboardManger.Controllers
                 return Unauthorized(new ApiResponse<string>(401, "Invalid username or password", null));
             }
 
+            if (user.StateId == (int)State.Inactive) { 
+                return Unauthorized(new ApiResponse<string>(401, "Not an active user" , null));
+            }
+
             var token = GenerateJwtToken(user.Username, user.Guid.ToString());
             var refreshToken = GenerateRefreshToken();
             refreshTokens.Add(refreshToken);

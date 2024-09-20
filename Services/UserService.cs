@@ -48,31 +48,152 @@ namespace dashboardManger.Services
             return _mapper.Map<UserDTO>(user);
         }
 
-        public User GetUserById(int id)
+        public User GetUserByGuid(string guid)
         {
-            return _context.Users.Find(id);
+            return _context.Users.Find(guid);
         }
 
-        public void AddUser(User user)
+        public User AddUser(UserUpdateSummary userUpdateSummary)
         {
-            _context.Users.Add(user);
-            _context.SaveChanges();
-        }
-
-        public void UpdateUser(User user)
-        {
-            _context.Users.Update(user);
-            _context.SaveChanges();
-        }
-
-        public void DeleteUser(int id)
-        {
-            var user = _context.Users.Find(id);
-            if (user != null)
+            var newUser = new User()
             {
-                _context.Users.Remove(user);
-                _context.SaveChanges();
+                Username = userUpdateSummary.UserName,
+                Email = userUpdateSummary.Email,
+                UserRoleId = userUpdateSummary.UserRoleId,
+                StateId = userUpdateSummary.StateId,
+                DepartmentId = userUpdateSummary.DepartmentId,
+                PhoneNumber = userUpdateSummary.PhoneNumber,
+                FirstName = userUpdateSummary.FirstName,
+                LastName = userUpdateSummary.LastName,
+                Password = BCrypt.Net.BCrypt.HashPassword(userUpdateSummary.Password),
+            };
+
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+
+            return newUser;
+        }
+
+        public bool UpdateUser(UserUpdateSummary userUpdateSummary)
+        {
+            var user = _context.Users.SingleOrDefault(u => u.Guid.ToString() == userUpdateSummary.Guid);
+            if (user == null)
+            {
+                throw new Exception("User not found");
             }
+            user.Username = userUpdateSummary.UserName;
+            user.Email = userUpdateSummary.Email;
+            user.UserRoleId = userUpdateSummary.UserRoleId;
+            user.StateId = userUpdateSummary.StateId;
+            user.DepartmentId = userUpdateSummary.DepartmentId;
+            user.PhoneNumber = userUpdateSummary.PhoneNumber;
+            user.FirstName = userUpdateSummary.FirstName;
+            user.LastName = userUpdateSummary.LastName;
+            if (!string.IsNullOrEmpty(userUpdateSummary.Password)) {
+                user.Password = BCrypt.Net.BCrypt.HashPassword(userUpdateSummary.Password);
+            }
+
+            _context.Users.Update(user);
+            var rowsAffected = _context.SaveChanges();
+
+            return rowsAffected > 0;
+        }
+
+        public bool DeleteUser(string userGuid)
+        {
+            try
+            {
+                var user = _context.Users.SingleOrDefault(l => l.Guid.ToString() == userGuid);
+                if (user != null)
+                {
+                    //set state to inactive and update deleted column
+                    user.StateId = (int)State.Inactive;
+                    user.Deleted = DateTime.Now;
+                    _context.Users.Update(user);
+                    var affected = _context.SaveChanges();
+                    return affected > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+            }
+
+            return false;
+        }
+
+        public bool BatchDeleteUsers(List<string> guids)
+        {
+            try
+            {
+                if (guids == null || guids.Count == 0)
+                {
+                    return false;
+                }
+
+                var users = _context.Users.Where(u => guids.Contains(u.Guid.ToString())).ToList();
+                if (users.Count == 0)
+                {
+                    return false;
+                }
+
+                //set state to inactive and update deleted column
+                foreach (var user in users)
+                {
+                    user.StateId = (int)State.Inactive;
+                    user.Deleted = DateTime.Now;
+                    _context.Users.Update(user);
+                }
+                var affected = _context.SaveChanges();
+                return affected > 0;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+            }
+
+            return false;
+        }
+
+        public string UploadAvatar(string userGuid, IFormFile file) { 
+            var user = _context.Users.SingleOrDefault(u => u.Guid.ToString() == userGuid);
+            if (user == null)
+            {
+                throw new Exception("User not found");
+            }
+
+            //set file path
+            var uploadFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "File", "Image");
+            if (!Directory.Exists(uploadFolderPath))
+            {
+                throw new Exception("Upload folder not found");
+            }
+
+            //set file name(file name + userguid)
+            var extension = Path.GetExtension(file.FileName);
+            var fileName = $"{file.Name}_{userGuid}{extension}";
+            var filePath = Path.Combine(uploadFolderPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                //copy file to stream
+                file.CopyTo(stream);
+            }
+
+            var avatarUrl = $"/File/Image/{fileName}";
+            user.AvatarUrl = avatarUrl;
+
+            _context.Users.Update(user);
+            var rowsAffected = _context.SaveChanges();
+
+            if (rowsAffected > 0)
+            {
+                return avatarUrl;
+            }
+            else {
+                throw new Exception("Failed to upload avatar");
+            }               
         }
     }
 }

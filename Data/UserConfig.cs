@@ -35,6 +35,15 @@ namespace dashboardManger.Data
                 .IsRequired();
 
             builder.Property(e => e.DepartmentId);
+
+            builder.Property(e => e.AvatarUrl)
+                .HasMaxLength(1000);
+            builder.Property(e => e.PhoneNumber)
+                .HasMaxLength(15);
+            builder.Property(e => e.FirstName)
+                .HasMaxLength(50);
+            builder.Property(e => e.LastName)
+                .HasMaxLength(50);
         }
     }
 }

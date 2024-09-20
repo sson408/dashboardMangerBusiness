@@ -50,10 +50,10 @@ namespace dashboardManger.Controllers
             return Ok(new ApiResponse<UserDTO>(200, "get user successfully ", user));
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<User> GetUserById(int id)
+        [HttpGet("{guid}")]
+        public ActionResult<User> GetUserByGuid(string guid)
         {
-            var user = _context.Users.SingleOrDefault(u => u.Id == id);
+            var user = _context.Users.SingleOrDefault(u => u.Guid.ToString() == guid);
             if (user == null)
             {
                 return NotFound(new ApiResponse<string>(404, "User not found", null));
@@ -69,13 +69,11 @@ namespace dashboardManger.Controllers
         public ActionResult<PagedApiResponse<UserDTO>> ListAll([FromBody] UserSearchSummary searchSummary, [FromQuery] int pageNum = 1, int pageSize = 10) {
             try
             {
-                var dataList = _context.Users.AsQueryable();
-                var totalItems = dataList.Count();
-
-                var users = dataList.Skip((pageNum - 1) * pageSize).Take(pageSize).ToList();
+                var dataList = _context.Users.AsQueryable().OrderBy(l => l.StateId).ThenBy(l => l.Username);
+                var totalItems = dataList.Count();          
 
                 //map data
-                var userDtos = _mapper.Map<List<UserDTO>>(users);
+                var userDtos = _mapper.Map<List<UserDTO>>(dataList);
 
                 //filter data
                 if (searchSummary != null) {
@@ -95,6 +93,8 @@ namespace dashboardManger.Controllers
                         totalItems = userDtos.Count();
                     }              
                 }
+
+                var users = userDtos.Skip((pageNum - 1) * pageSize).Take(pageSize).ToList();
 
                 // Create pagination information
                 var pageInfo = new PageInfo
@@ -117,29 +117,80 @@ namespace dashboardManger.Controllers
         
         }
 
-        [HttpPost]
-        public ActionResult<User> AddUser(User user)
+        [HttpPost("create")]
+        public ActionResult<User> AddUser([FromBody] UserUpdateSummary userUpdateSummary)
         {
-            _userService.AddUser(user);
-            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
-        }
-
-        [HttpPut("{id}")]
-        public IActionResult UpdateUser(int id, User user)
-        {
-            if (id != user.Id)
+            var newUser = _userService.AddUser(userUpdateSummary);
+            var newUserGuid = newUser.Guid.ToString();
+            if (string.IsNullOrEmpty(newUserGuid))
             {
-                return BadRequest();
+                return BadRequest(new ApiResponse<string>(400, "User not added", null));
             }
-            _userService.UpdateUser(user);
-            return NoContent();
+
+            return  Ok(new ApiResponse<string>(200, "User added successfully", newUserGuid));
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteUser(int id)
+        [HttpPost("update")]
+        public ActionResult UpdateUser([FromBody] UserUpdateSummary userUpdateSummary)
         {
-            _userService.DeleteUser(id);
-            return NoContent();
+            var success = _userService.UpdateUser(userUpdateSummary);
+            if (!success)
+            {
+                return BadRequest(new ApiResponse<string>(400, "User not updated", null));
+            }
+            return Ok(new ApiResponse<bool>(200, "User updated successfully", success));
+        }
+
+        [HttpDelete("{guid}")]
+        public ActionResult DeleteUser(string guid)
+        {
+            try {
+                var success = _userService.DeleteUser(guid);
+                if (!success)
+                {
+                    return BadRequest(new ApiResponse<string>(400, "User not deleted", null));
+                }
+                return Ok(new ApiResponse<bool>(200, "User deleted successfully", success));
+            }
+            catch (Exception ex) {
+                return StatusCode(500, new ApiResponse<string>(500, ex.Message, null));
+            }
+
+        }
+
+        [HttpPost("batchDelete")]
+        public ActionResult BatchDelete([FromBody] List<string> guids) {
+            try { 
+                if (guids == null || guids.Count == 0) {
+                    return BadRequest(new ApiResponse<string>(400, "No user selected", null));
+                }
+
+                var success = _userService.BatchDeleteUsers(guids);
+                if (!success)
+                {
+                    return BadRequest(new ApiResponse<string>(400, "Users not deleted", null));
+                }
+                return Ok(new ApiResponse<bool>(200, "Users deleted successfully", success));
+            }
+            catch (Exception ex) {
+                return StatusCode(500, new ApiResponse<string>(500, ex.Message, null));
+            }
+        
+        }
+
+        [HttpPost("{userGuid}/uploadAvatar")]
+        public IActionResult UploadAvatar(string userGuid, IFormFile file)
+        {
+            try
+            {
+                var avatarUrl = _userService.UploadAvatar(userGuid, file);
+
+                return Ok(new ApiResponse<string>(200, "Avatar uploaded successfully", avatarUrl));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<string>(500, ex.Message, null));
+            }
         }
     }
 }

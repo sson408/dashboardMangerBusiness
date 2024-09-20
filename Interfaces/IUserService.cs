@@ -1,18 +1,21 @@
 ﻿using dashboardManger.DTOs;
 using dashboardManger.Models;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace dashboardManger.Interfaces
 {
     public interface IUserService
     {
         IEnumerable<User> GetAllUsers();
-        User GetUserById(int id);
+        User GetUserByGuid(string guid);
         UserDTO GetCurrentUser(string userGuid);
-        void AddUser(User user);
-        void UpdateUser(User user);
-        void DeleteUser(int id);
-        
+        User AddUser(UserUpdateSummary userUpdateSummary);
+        bool UpdateUser(UserUpdateSummary userUpdateSummary);
+        bool DeleteUser(string userGuid);
+        bool BatchDeleteUsers(List<string> userGuids);
         List<UserDTO> ListAllUsers();  
+        string UploadAvatar(string userGuid, IFormFile file);
+
     }
 }

@@ -6,24 +6,23 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace dashboardManger.Migrations
 {
     /// <inheritdoc />
-    public partial class user : Migration
+    public partial class adddeletedcolumntouser : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<Guid>(
-                name: "Guid",
+            migrationBuilder.AddColumn<DateTime>(
+                name: "Deleted",
                 table: "Users",
-                type: "uniqueidentifier",
-                nullable: false,
-                defaultValueSql: "NEWID()");
+                type: "datetime2",
+                nullable: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Guid",
+                name: "Deleted",
                 table: "Users");
         }
     }

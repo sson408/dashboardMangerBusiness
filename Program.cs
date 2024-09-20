@@ -6,6 +6,8 @@ using dashboardManger.Data;
 using dashboardManger.DTOs;
 using dashboardManger.Extensions;
 using System.Security.Claims;
+using Microsoft.Extensions.FileProviders;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -122,7 +124,17 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddCustomServices();
 
+var uploadFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "File", "Image");
+
 var app = builder.Build();
+
+app.UseStaticFiles();
+// setup static file
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), uploadFolderPath)),
+    RequestPath = "/File/Image"
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
