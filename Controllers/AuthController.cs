@@ -26,7 +26,7 @@ namespace dashboardManger.Controllers
         [HttpPost("register")]
         public IActionResult Register([FromBody] UserRegister request)
         {
-            if (_context.Users.Any(u => u.Username == request.Username))
+            if (_context.User.Any(u => u.Username == request.Username))
             {
                 return BadRequest(new ApiResponse<string>(400, "Username already exists", null));
             }
@@ -38,7 +38,7 @@ namespace dashboardManger.Controllers
                 Email = request.Email
             };
 
-            _context.Users.Add(user);
+            _context.User.Add(user);
             _context.SaveChanges();
 
             return Ok(new ApiResponse<string>(200, "User registered successfully", null));
@@ -47,7 +47,7 @@ namespace dashboardManger.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] UserLogin request)
         {
-            var user = _context.Users.SingleOrDefault(u => u.Username == request.Username);
+            var user = _context.User.SingleOrDefault(u => u.Username == request.Username);
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
             {
                 return Unauthorized(new ApiResponse<string>(401, "Invalid username or password", null));

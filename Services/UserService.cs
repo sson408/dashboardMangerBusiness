@@ -22,12 +22,12 @@ namespace dashboardManger.Services
 
         public IEnumerable<User> GetAllUsers()
         {
-            return _context.Users.ToList();
+            return _context.User.ToList();
         }
 
         public List<UserDTO> ListAllUsers()
         {
-            var users = _context.Users.ToList();
+            var users = _context.User.ToList();
             return _mapper.Map<List<UserDTO>>(users);
         }
         public UserDTO GetCurrentUser(string userGuid)
@@ -37,7 +37,7 @@ namespace dashboardManger.Services
                 return null; 
             }
 
-            var user = _context.Users.SingleOrDefault(u => u.Guid.ToString() == userGuid);
+            var user = _context.User.SingleOrDefault(u => u.Guid.ToString() == userGuid);
 
             if (user == null)
             {
@@ -50,7 +50,7 @@ namespace dashboardManger.Services
 
         public User GetUserByGuid(string guid)
         {
-            return _context.Users.Find(guid);
+            return _context.User.Find(guid);
         }
 
         public User AddUser(UserUpdateSummary userUpdateSummary)
@@ -68,7 +68,7 @@ namespace dashboardManger.Services
                 Password = BCrypt.Net.BCrypt.HashPassword(userUpdateSummary.Password),
             };
 
-            _context.Users.Add(newUser);
+            _context.User.Add(newUser);
             _context.SaveChanges();
 
             return newUser;
@@ -76,7 +76,7 @@ namespace dashboardManger.Services
 
         public bool UpdateUser(UserUpdateSummary userUpdateSummary)
         {
-            var user = _context.Users.SingleOrDefault(u => u.Guid.ToString() == userUpdateSummary.Guid);
+            var user = _context.User.SingleOrDefault(u => u.Guid.ToString() == userUpdateSummary.Guid);
             if (user == null)
             {
                 throw new Exception("User not found");
@@ -93,7 +93,7 @@ namespace dashboardManger.Services
                 user.Password = BCrypt.Net.BCrypt.HashPassword(userUpdateSummary.Password);
             }
 
-            _context.Users.Update(user);
+            _context.User.Update(user);
             var rowsAffected = _context.SaveChanges();
 
             return rowsAffected > 0;
@@ -103,13 +103,13 @@ namespace dashboardManger.Services
         {
             try
             {
-                var user = _context.Users.SingleOrDefault(l => l.Guid.ToString() == userGuid);
+                var user = _context.User.SingleOrDefault(l => l.Guid.ToString() == userGuid);
                 if (user != null)
                 {
                     //set state to inactive and update deleted column
                     user.StateId = (int)State.Inactive;
                     user.Deleted = DateTime.Now;
-                    _context.Users.Update(user);
+                    _context.User.Update(user);
                     var affected = _context.SaveChanges();
                     return affected > 0;
                 }
@@ -131,7 +131,7 @@ namespace dashboardManger.Services
                     return false;
                 }
 
-                var users = _context.Users.Where(u => guids.Contains(u.Guid.ToString())).ToList();
+                var users = _context.User.Where(u => guids.Contains(u.Guid.ToString())).ToList();
                 if (users.Count == 0)
                 {
                     return false;
@@ -142,7 +142,7 @@ namespace dashboardManger.Services
                 {
                     user.StateId = (int)State.Inactive;
                     user.Deleted = DateTime.Now;
-                    _context.Users.Update(user);
+                    _context.User.Update(user);
                 }
                 var affected = _context.SaveChanges();
                 return affected > 0;
@@ -157,7 +157,7 @@ namespace dashboardManger.Services
         }
 
         public string UploadAvatar(string userGuid, IFormFile file) { 
-            var user = _context.Users.SingleOrDefault(u => u.Guid.ToString() == userGuid);
+            var user = _context.User.SingleOrDefault(u => u.Guid.ToString() == userGuid);
             if (user == null)
             {
                 throw new Exception("User not found");
@@ -184,7 +184,7 @@ namespace dashboardManger.Services
             var avatarUrl = $"/File/Image/{fileName}";
             user.AvatarUrl = avatarUrl;
 
-            _context.Users.Update(user);
+            _context.User.Update(user);
             var rowsAffected = _context.SaveChanges();
 
             if (rowsAffected > 0)

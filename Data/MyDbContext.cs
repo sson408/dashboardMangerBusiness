@@ -7,7 +7,8 @@ namespace dashboardManger.Data
     {
         public MyDbContext(DbContextOptions<MyDbContext> options) : base(options) { }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> User { get; set; }
+        public DbSet<Property> Property { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

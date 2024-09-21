@@ -53,7 +53,7 @@ namespace dashboardManger.Controllers
         [HttpGet("{guid}")]
         public ActionResult<User> GetUserByGuid(string guid)
         {
-            var user = _context.Users.SingleOrDefault(u => u.Guid.ToString() == guid);
+            var user = _context.User.SingleOrDefault(u => u.Guid.ToString() == guid);
             if (user == null)
             {
                 return NotFound(new ApiResponse<string>(404, "User not found", null));
@@ -69,7 +69,7 @@ namespace dashboardManger.Controllers
         public ActionResult<PagedApiResponse<UserDTO>> ListAll([FromBody] UserSearchSummary searchSummary, [FromQuery] int pageNum = 1, int pageSize = 10) {
             try
             {
-                var dataList = _context.Users.AsQueryable().OrderBy(l => l.StateId).ThenBy(l => l.Username);
+                var dataList = _context.User.AsQueryable().OrderBy(l => l.StateId).ThenBy(l => l.Username);
                 var totalItems = dataList.Count();          
 
                 //map data

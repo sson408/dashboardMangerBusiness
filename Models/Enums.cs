@@ -21,4 +21,21 @@
         Rental = 4
     }
 
+    public enum ProperyStatus
+    {
+        Listing = 1,
+        Withdrawn = 2,
+        Sold = 3
+    }
+
+    public enum PropertyType
+    {
+        House = 1,
+        Apartment = 2,
+        Townhouse = 3,
+        Land = 4,
+        Rural = 5,
+        Commercial = 6
+    }
+
 }
