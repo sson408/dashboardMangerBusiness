@@ -12,8 +12,8 @@ using dashboardManger.Data;
 namespace dashboardManger.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20240921121504_update property")]
-    partial class updateproperty
+    [Migration("20240923093140_add index for property")]
+    partial class addindexforproperty
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace dashboardManger.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("dashboardManger.Models.Property", b =>
+            modelBuilder.Entity("dashboardManger.Models.RealEstateProperty", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -83,8 +83,10 @@ namespace dashboardManger.Migrations
 
                     b.Property<string>("GUID")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
+                        .HasColumnType("nvarchar(36)")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(2048)
@@ -134,6 +136,9 @@ namespace dashboardManger.Migrations
                         .HasDefaultValueSql("GETUTCDATE()");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GUID")
+                        .IsUnique();
 
                     b.HasIndex("ListingAgent1Id");
 
@@ -204,7 +209,7 @@ namespace dashboardManger.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("dashboardManger.Models.Property", b =>
+            modelBuilder.Entity("dashboardManger.Models.RealEstateProperty", b =>
                 {
                     b.HasOne("dashboardManger.Models.User", "ListingAgent1")
                         .WithMany()

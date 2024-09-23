@@ -50,7 +50,7 @@ builder.Services.AddAuthentication(options =>
     {
         OnMessageReceived = context =>
         {
-            // 捕获和输出接收到的令牌
+            //get token from header
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
             Console.WriteLine($"Received Token: {token}");
 
@@ -58,7 +58,7 @@ builder.Services.AddAuthentication(options =>
         },
         OnAuthenticationFailed = context =>
         {
-            // 当身份验证失败时触发
+            //if authentication failed
             Console.WriteLine("Authentication failed:");
             Console.WriteLine($"Exception: {context.Exception.Message}");
 
@@ -67,17 +67,16 @@ builder.Services.AddAuthentication(options =>
                 Console.WriteLine($"Token exception: {tokenException.Message}");
             }
 
-            // 打印完整的异常堆栈跟踪
+ 
             Console.WriteLine(context.Exception.ToString());
 
             return Task.CompletedTask;
         },
         OnTokenValidated = context =>
         {
-            // 当令牌验证成功时触发
+            //if token is validated
             Console.WriteLine("Token validated successfully");
 
-            // 输出一些关于令牌的信息
             var claimsIdentity = context.Principal.Identity as ClaimsIdentity;
             Console.WriteLine("User Claims:");
             foreach (var claim in claimsIdentity.Claims)
@@ -89,18 +88,17 @@ builder.Services.AddAuthentication(options =>
         },
         OnChallenge = context =>
         {
-            // 当身份验证被挑战时（即未能通过身份验证）触发
+            //if token validation challenge
             Console.WriteLine("Token validation challenge:");
             Console.WriteLine($"Error: {context.Error}");
             Console.WriteLine($"ErrorDescription: {context.ErrorDescription}");
 
-            // 详细描述挑战的原因
             if (context.AuthenticateFailure != null)
             {
                 Console.WriteLine($"AuthenticateFailure: {context.AuthenticateFailure.Message}");
             }
 
-            // 允许自定义响应或取消默认响应行为
+            //we can handle the response here
             // context.HandleResponse();
 
             return Task.CompletedTask;
@@ -125,6 +123,7 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddCustomServices();
 
 var uploadFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "File", "Image");
+var uoloadPropertyFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "File", "Property");
 
 var app = builder.Build();
 
@@ -134,6 +133,12 @@ app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), uploadFolderPath)),
     RequestPath = "/File/Image"
+});
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), uoloadPropertyFolderPath)),
+    RequestPath = "/File/Property"
 });
 
 // Configure the HTTP request pipeline.

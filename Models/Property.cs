@@ -3,10 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace dashboardManger.Models
 {
-    public class Property
+    [Table("Property")]
+    public class RealEstateProperty
     {
         [Key]
         public long Id { get; set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string GUID { get; private set; } = Guid.NewGuid().ToString();
 
         [Required]
@@ -82,8 +85,8 @@ namespace dashboardManger.Models
         //listing date
         public DateTime DateTime { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
     }
 
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using dashboardManger.Data;
 
@@ -11,9 +12,11 @@ using dashboardManger.Data;
 namespace dashboardManger.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240922101825_update property")]
+    partial class updateproperty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace dashboardManger.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("dashboardManger.Models.RealEstateProperty", b =>
+            modelBuilder.Entity("dashboardManger.Models.Property", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -134,9 +137,6 @@ namespace dashboardManger.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GUID")
-                        .IsUnique();
-
                     b.HasIndex("ListingAgent1Id");
 
                     b.HasIndex("ListingAgent2Id");
@@ -206,7 +206,7 @@ namespace dashboardManger.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("dashboardManger.Models.RealEstateProperty", b =>
+            modelBuilder.Entity("dashboardManger.Models.Property", b =>
                 {
                     b.HasOne("dashboardManger.Models.User", "ListingAgent1")
                         .WithMany()

@@ -5,15 +5,19 @@ using dashboardManger.Models;
 
 namespace dashboardManger.Data
 {
-    public class PropertyConfig : IEntityTypeConfiguration<Property>
+    public class PropertyConfig : IEntityTypeConfiguration<RealEstateProperty>
     {
-        public void Configure(EntityTypeBuilder<Property> builder)
+        public void Configure(EntityTypeBuilder<RealEstateProperty> builder)
         {
             builder.HasKey(p => p.Id);
 
             builder.Property(p => p.GUID)
                 .IsRequired()
+                .HasDefaultValueSql("NEWID()")
                 .HasMaxLength(36);
+
+            builder.HasIndex(p => p.GUID)
+            .IsUnique(); 
 
             builder.Property(p => p.Address)
                 .IsRequired()

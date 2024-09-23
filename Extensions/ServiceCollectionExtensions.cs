@@ -9,6 +9,8 @@ namespace dashboardManger.Extensions
         {
             services.AddScoped<IUserService, UserService>();
 
+            services.AddScoped<IPropertyService, PropertyService>();
+
             return services;
         }
     }

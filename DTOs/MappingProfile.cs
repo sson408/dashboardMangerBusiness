@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using dashboardManger.Models;
 using dashboardManger.DTOs;
+using static dashboardManger.DTOs.PropertyDTO;
 
 namespace dashboardManger.DTOs
 {
@@ -16,12 +17,12 @@ namespace dashboardManger.DTOs
                     ? ((Department)src.DepartmentId.Value).ToString()
                     : string.Empty))
                 .ForMember(l => l.FilterWord, opt => opt.MapFrom(src =>
-                    $"{src.Username} {src.Email} {((UserRole)src.UserRoleId).ToString().Replace('_', ' ')} {((State)src.StateId).ToString()} ".ToLower() +
+                    $"{src.Username} {src.FirstName} {src.LastName} {src.Email} {((UserRole)src.UserRoleId).ToString().Replace('_', ' ')} {((State)src.StateId).ToString()} ".ToLower() +
                     $"{(src.DepartmentId.HasValue ? ((Department)src.DepartmentId.Value).ToString() : string.Empty)}".ToLower()
                 ));
 
             //property
-            CreateMap<Property, PropertyDTO>()
+            CreateMap<RealEstateProperty, PropertyDTOSummary>()
                 .ForMember(l => l.Type, opt => opt.MapFrom(src => Enum.GetName(typeof(PropertyType), src.TypeId)))
                 .ForMember(l => l.StatusId, opt => opt.MapFrom(src => Enum.GetName(typeof(ProperyStatus), src.StatusId)))
                 .ForMember(l => l.FilterWord, opt => opt.MapFrom(src =>
