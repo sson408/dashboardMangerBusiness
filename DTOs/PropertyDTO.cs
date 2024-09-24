@@ -70,7 +70,6 @@ namespace dashboardManger.DTOs
             public string? ImageUrl { get; set; }
             public string? ListingPrice { get; set; }
             public decimal? SoldPrice { get; set; }
-            [JsonIgnore]
             public int? TypeId { get; set; }
             public string? Type { get; set; }
             public double? FloorArea { get; set; }

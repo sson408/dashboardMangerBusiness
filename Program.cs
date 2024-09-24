@@ -128,6 +128,7 @@ var uoloadPropertyFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Fi
 var app = builder.Build();
 
 app.UseStaticFiles();
+
 // setup static file
 app.UseStaticFiles(new StaticFileOptions
 {

@@ -59,6 +59,12 @@ namespace dashboardManger.Controllers
                         totalItems = dtoList.Count();
                     }
 
+                    if (searchSummary.TypeId > 0) { 
+                        dtoList.RemoveAll(l => l.TypeId != searchSummary.TypeId);
+
+                        totalItems = dtoList.Count();                        
+                    }
+
                     if (!string.IsNullOrEmpty(searchSummary.FilterWord))
                     {
                         var filterWordList = searchSummary.FilterWord.ToLower().Split(' ');
