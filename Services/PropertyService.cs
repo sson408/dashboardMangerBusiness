@@ -21,6 +21,18 @@ namespace dashboardManger.Services
             _mapper = mapper;
         }
 
+
+        public RealEstateProperty GetPropertyByGuid(string guid)
+        {
+            var property = _context.Property.SingleOrDefault(p => p.GUID.ToString() == guid);
+            if (property == null)
+            {
+                return null;
+            }
+
+            return property;
+        }
+
         public IEnumerable<RealEstateProperty> GetAllProperties()
         {
             return _context.Property.ToList();

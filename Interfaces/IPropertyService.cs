@@ -7,5 +7,7 @@ namespace dashboardManger.Interfaces
     public interface IPropertyService
     {
         IEnumerable<RealEstateProperty> GetAllProperties();
+
+        RealEstateProperty GetPropertyByGuid(string guid);
     }
 }

@@ -64,6 +64,32 @@ namespace dashboardManger.Controllers
             return Ok(new ApiResponse<UserDTO>(200, "successfully", userDto));
         }
 
+        //for dropdown list
+        [HttpGet("simpleList")]
+        public ActionResult<PagedApiResponse<UserDTO>> SimpleListUser()
+        {
+            var users = _context.User.Where(u => u.StateId == 1).ToList();
+
+            var result = new List<UserDTO>();
+            foreach (var user in users) {
+                var data = new UserDTO
+                {
+                    Guid = user.Guid.ToString()
+                };
+
+                var userNameDisplay = user.FirstName;
+                if (!string.IsNullOrEmpty(user.LastName) && !userNameDisplay.Contains(user.LastName)) { 
+                    userNameDisplay += " " + user.LastName;
+                }
+
+                data.UserNameDisplay = userNameDisplay;
+
+                result.Add(data);
+            }
+
+            return Ok(new PagedApiResponse<UserDTO>(200, "Success", null, result));
+            
+        }
 
         [HttpPost("listAll")]
         public ActionResult<PagedApiResponse<UserDTO>> ListAll([FromBody] UserSearchSummary searchSummary, [FromQuery] int pageNum = 1, int pageSize = 10) {
@@ -192,5 +218,6 @@ namespace dashboardManger.Controllers
                 return StatusCode(500, new ApiResponse<string>(500, ex.Message, null));
             }
         }
+
     }
 }

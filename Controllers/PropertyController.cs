@@ -31,6 +31,22 @@ namespace dashboardManger.Controllers
             return Ok(_propertyService.GetAllProperties());
         }
 
+        [HttpGet("{guid}")]
+        public ActionResult<PropertyDTOSummary> GetPropertyByGuid(string guid)
+        {
+            var property = _context.Property.SingleOrDefault(p => p.GUID.ToString() == guid);
+            if (property == null)
+            {
+                return NotFound(new ApiResponse<string>(404, "Property not found", null));
+            }
+
+            var result = GetDtoSummary(property);
+
+            return Ok(new ApiResponse<PropertyDTOSummary>(200, "Success", result));
+        }
+
+        //[HttpPost("create")]
+        //public ActionResult<PropertyDTOSummary> AddUser([FromBody] PropertyUpdateSummary propertyUpdateSummary)
 
         [HttpPost("listAll")]
         public ActionResult<List<PropertyDTOSummary>> ListAll([FromBody] PropertySearchSummary searchSummary, [FromQuery] int pageNum = 1, int pageSize = 10)
@@ -101,7 +117,7 @@ namespace dashboardManger.Controllers
         }
 
 
-        public static List<PropertyDTOSummary> GetDtoDataList(IOrderedQueryable<RealEstateProperty> dataList)
+        private static List<PropertyDTOSummary> GetDtoDataList(IOrderedQueryable<RealEstateProperty> dataList)
         {
             var result = new List<PropertyDTOSummary>();
             if (dataList != null && dataList.Count() > 0)
@@ -154,6 +170,52 @@ namespace dashboardManger.Controllers
 
             return result;
         }
+
+        private static PropertyDTOSummary GetDtoSummary(RealEstateProperty data)
+        {
+            var dtoData = new PropertyDTOSummary(data);
+
+            //status
+            var statusId = data.StatusId;
+            if (statusId > 0) dtoData.Status = Enum.GetName(typeof(ProperyStatus), statusId);
+
+            //type
+            var typeId = data.TypeId;
+            if (typeId > 0) dtoData.Type = Enum.GetName(typeof(PropertyType), typeId);
+
+            //listing agent
+            var listingAgent1Id = data.ListingAgent1Id;
+            if (listingAgent1Id > 0 && data.ListingAgent1 != null)
+            {
+                dtoData.ListingAgent1Guid = data.ListingAgent1.Guid.ToString();
+                dtoData.ListingAgent1Name = $"{data.ListingAgent1.FirstName} {data.ListingAgent1.LastName}";
+            }
+            var listingAgent2Id = data.ListingAgent2Id;
+            if (listingAgent2Id > 0 && data.ListingAgent2 != null)
+            {
+                dtoData.ListingAgent2Guid = data.ListingAgent2.Guid.ToString();
+                dtoData.ListingAgent2Name = $"{data.ListingAgent2.FirstName} {data.ListingAgent2.LastName}";
+            }
+
+            dtoData.ListingAgentNameDisplay = !string.IsNullOrEmpty(dtoData.ListingAgent1Name) ? dtoData.ListingAgent1Name : string.Empty;
+
+            if (!string.IsNullOrEmpty(dtoData.ListingAgent2Name))
+            {
+                if (!string.IsNullOrEmpty(dtoData.ListingAgentNameDisplay))
+                {
+                    //add line break
+                    dtoData.ListingAgentNameDisplay += "\n";
+                }
+                dtoData.ListingAgentNameDisplay += dtoData.ListingAgent2Name;
+            }
+
+            var filterWord = $"{data.Address} {dtoData.Status} {dtoData.Type} {dtoData.ListingAgentNameDisplay}";
+
+            dtoData.FilterWord = filterWord.ToLower();
+
+            return dtoData;
+        }
+
 
     }
 }

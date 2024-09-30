@@ -16,7 +16,8 @@ namespace dashboardManger.DTOs
         public string PhoneNumber { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string AvatarUrl { get; set; }
+        public string AvatarUrl { get; set; } 
+        public string UserNameDisplay { get; set; }
         [JsonIgnore]
         public string FilterWord { get; set; }
     }

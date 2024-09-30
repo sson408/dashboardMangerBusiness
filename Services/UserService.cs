@@ -30,6 +30,7 @@ namespace dashboardManger.Services
             var users = _context.User.ToList();
             return _mapper.Map<List<UserDTO>>(users);
         }
+
         public UserDTO GetCurrentUser(string userGuid)
         {
             if (string.IsNullOrEmpty(userGuid))
