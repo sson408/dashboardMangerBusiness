@@ -9,5 +9,14 @@ namespace dashboardManger.Interfaces
         IEnumerable<RealEstateProperty> GetAllProperties();
 
         RealEstateProperty GetPropertyByGuid(string guid);
+
+        RealEstateProperty AddProperty(PropertyUpdateSummary propertyUpdateSummary);
+
+        bool UpdateProperty(PropertyUpdateSummary propertyUpdateSummary);
+        bool DeleteProperty(string propertyGuid);
+
+        bool BatchDeleteProperties(List<string> propertyGuids);
+
+        string UploadImage(string propertyGuid, IFormFile file);
     }
 }

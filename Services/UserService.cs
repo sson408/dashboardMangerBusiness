@@ -176,6 +176,14 @@ namespace dashboardManger.Services
             var fileName = $"{file.Name}_{userGuid}{extension}";
             var filePath = Path.Combine(uploadFolderPath, fileName);
 
+            // Check if the file exists and delete it
+            if (File.Exists(filePath))
+            {
+                // Ensure the file is not being accessed by any process before deleting
+               File.SetAttributes(filePath, FileAttributes.Normal); // Remove any read-only attribute
+               File.Delete(filePath);
+            }
+
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 //copy file to stream

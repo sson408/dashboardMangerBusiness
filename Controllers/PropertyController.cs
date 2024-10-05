@@ -31,6 +31,45 @@ namespace dashboardManger.Controllers
             return Ok(_propertyService.GetAllProperties());
         }
 
+        [HttpDelete("{guid}")]
+        public ActionResult DeleteProperty(string guid)
+        {
+            try
+            {
+                var success = _propertyService.DeleteProperty(guid);
+                if (!success)
+                {
+                    return BadRequest(new ApiResponse<string>(400, "Property not deleted", null));
+                }
+                return Ok(new ApiResponse<bool>(200, "Property deleted successfully", success));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<string>(500, ex.Message, null));
+            }
+
+        }
+
+
+        [HttpPost("batchDelete")]
+        public ActionResult BatchDeleteProperties([FromBody] List<string> propertyGuids)
+        {
+            try
+            {
+                var success = _propertyService.BatchDeleteProperties(propertyGuids);
+                if (!success)
+                {
+                    return BadRequest(new ApiResponse<string>(400, "Properties not deleted", null));
+                }
+                return Ok(new ApiResponse<bool>(200, "Properties deleted successfully", success));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<string>(500, ex.Message, null));
+            }
+        }
+
+
         [HttpGet("{guid}")]
         public ActionResult<PropertyDTOSummary> GetPropertyByGuid(string guid)
         {
@@ -45,8 +84,45 @@ namespace dashboardManger.Controllers
             return Ok(new ApiResponse<PropertyDTOSummary>(200, "Success", result));
         }
 
-        //[HttpPost("create")]
-        //public ActionResult<PropertyDTOSummary> AddUser([FromBody] PropertyUpdateSummary propertyUpdateSummary)
+        [HttpPost("update")]
+        public ActionResult UpdateProperty([FromBody] PropertyUpdateSummary propertyUpdateSummary)
+        {
+            var success = _propertyService.UpdateProperty(propertyUpdateSummary);
+            if (!success)
+            {
+                return BadRequest(new ApiResponse<string>(400, "Propery not updated", null));
+            }
+            return Ok(new ApiResponse<bool>(200, "Propery updated successfully", success));
+        }
+
+
+        [HttpPost("create")]
+        public ActionResult<RealEstateProperty> AddProperty([FromBody] PropertyUpdateSummary propertyUpdateSummary)
+        {
+            var newProperty = _propertyService.AddProperty(propertyUpdateSummary);
+            var newPropertyGuid = newProperty.GUID;
+            if (string.IsNullOrEmpty(newPropertyGuid))
+            {
+                return BadRequest(new ApiResponse<string>(400, "Property not added", null));
+            }
+
+            return Ok(new ApiResponse<string>(200, "Property added successfully", newPropertyGuid));
+
+        }
+
+        [HttpPost("{propertyGuid}/uploadImage")]
+        public IActionResult UploadImage(string propertyGuid, IFormFile file) {
+            try
+            {
+                var avatarUrl = _propertyService.UploadImage(propertyGuid, file);
+
+                return Ok(new ApiResponse<string>(200, "Image uploaded successfully", avatarUrl));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<string>(500, ex.Message, null));
+            }
+        }
 
         [HttpPost("listAll")]
         public ActionResult<List<PropertyDTOSummary>> ListAll([FromBody] PropertySearchSummary searchSummary, [FromQuery] int pageNum = 1, int pageSize = 10)

@@ -91,32 +91,14 @@ namespace dashboardManger.DTOs
 
         public class PropertyUpdateSummary
         {
-            public string Guid { get; set; }
+            public string? Guid { get; set; }
             public string Address { get; set; }
             public int StatusId { get; set; }
-            public string? ListingAgent1Guid { get; set; }
-            public string? ListingAgent1Name { get; set; }
-            public string? ListingAgent2Guid { get; set; }
-            public string? ListingAgent2Name { get; set; }
-            public string? Buyer1FirstName { get; set; }
-            public string? Buyer1LastName { get; set; }
-            public string? Buyer1PhoneNumber { get; set; }
-            public string? Buyer1Email { get; set; }
-            public string? Buyer2FirstName { get; set; }
-            public string? Buyer2LastName { get; set; }
-            public string? Buyer2PhoneNumber { get; set; }
-            public string? Buyer2Email { get; set; }
-            public string? OriginalOwnerFirstName { get; set; }
-            public string? OriginalOwnerLastName { get; set; }
-            public string? OriginalOwnerPhoneNumber { get; set; }
-            public string? OriginalOwnerEmail { get; set; }
-            public string ImageUrl { get; set; }
-            public string ListingPrice { get; set; }
-            public decimal SoldPrice { get; set; }
             public int TypeId { get; set; }
-            public double FloorArea { get; set; }
-            public double TotalArea { get; set; }
-            public DateTime DateTime { get; set; }
+            public string? ListingAgent1Guid { get; set; }
+            public string? ListingAgent2Guid { get; set; }
+            public long? DateTimeStamp { get; set; }
+
         }
     }
 }
