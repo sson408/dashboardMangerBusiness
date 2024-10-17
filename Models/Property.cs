@@ -71,16 +71,15 @@ namespace dashboardManger.Models
         [StringLength(2048)]
         public string? ImageUrl { get; set; }
 
-        // Pricing Information
-        [StringLength(256)]
-        public string? ListingPrice { get; set; } // Example: "Asking Price"
-
-        public decimal? SoldPrice { get; set; } // Final sold price
+        public decimal? SoldPrice { get; set; }
+        public decimal? FirstPartPrice { get; set; }
+        public decimal? FirstPartPercentage { get; set; }
+        public decimal? RestPartPrice { get; set; }
+        public decimal? RestPartPercentage { get; set; }
+        public decimal? Commission { get; set; }
 
         // Property Type and Area
         public int TypeId { get; set; } 
-        public double? FloorArea { get; set; } 
-        public double? TotalArea { get; set; } 
 
         //listing date
         public DateTime DateTime { get; set; }

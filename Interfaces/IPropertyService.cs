@@ -12,6 +12,7 @@ namespace dashboardManger.Interfaces
 
         RealEstateProperty AddProperty(PropertyUpdateSummary propertyUpdateSummary);
 
+        bool SetSold(PropertyUpdateSummary propertyUpdateSummary);
         bool UpdateProperty(PropertyUpdateSummary propertyUpdateSummary);
         bool DeleteProperty(string propertyGuid);
 

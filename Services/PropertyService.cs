@@ -75,8 +75,8 @@ namespace dashboardManger.Services
             var newProperty = new RealEstateProperty()
             {
                 Address = propertyUpdateSummary.Address,
-                StatusId = propertyUpdateSummary.StatusId,
-                TypeId = propertyUpdateSummary.TypeId,
+                StatusId = propertyUpdateSummary.StatusId.Value,
+                TypeId = propertyUpdateSummary.TypeId.Value,
                 ListingAgent1Id = _context.User.SingleOrDefault(u => u.Guid.ToString() == propertyUpdateSummary.ListingAgent1Guid).Id,
                 ListingAgent2Id = _context.User.SingleOrDefault(u => u.Guid.ToString() == propertyUpdateSummary.ListingAgent2Guid).Id,
                 DateTime = dateTime,
@@ -114,8 +114,8 @@ namespace dashboardManger.Services
 
 
             property.Address = propertyUpdateSummary.Address;
-            property.StatusId = propertyUpdateSummary.StatusId;
-            property.TypeId = propertyUpdateSummary.TypeId;
+            property.StatusId = propertyUpdateSummary.StatusId.Value;
+            property.TypeId = propertyUpdateSummary.TypeId.Value;
             property.ListingAgent1Id = listingAgent1Id;
             property.ListingAgent2Id = listingAgent2Id;
             property.DateTime = dateTime;
@@ -177,6 +177,45 @@ namespace dashboardManger.Services
                 throw new Exception("Failed to upload image");
             }
             
+        }
+
+        public bool SetSold(PropertyUpdateSummary propertyUpdateSummary)
+        {
+            var property = _context.Property.SingleOrDefault(p => p.GUID == propertyUpdateSummary.Guid);
+            if (property == null)
+            {
+                throw new Exception("Property not found");
+            }
+
+            property.StatusId = (int)ProperyStatus.Sold;
+            property.SoldPrice = propertyUpdateSummary.SoldPrice;
+            property.FirstPartPrice = propertyUpdateSummary.FirstPartPrice;
+            property.FirstPartPercentage = propertyUpdateSummary.FirstPartPercentage;
+            property.RestPartPrice = propertyUpdateSummary.RestPartPrice;
+            property.RestPartPercentage = propertyUpdateSummary.RestPartPercentage;
+            property.Commission  = propertyUpdateSummary.Commission;
+
+            property.Buyer1Email = propertyUpdateSummary.Buyer1Email;
+            property.Buyer1FirstName = propertyUpdateSummary.Buyer1FirstName;
+            property.Buyer1LastName = propertyUpdateSummary.Buyer1LastName;
+            property.Buyer1PhoneNumber = propertyUpdateSummary.Buyer1PhoneNumber;
+            property.Buyer2Email = propertyUpdateSummary.Buyer2Email;
+            property.Buyer2FirstName = propertyUpdateSummary.Buyer2FirstName;
+            property.Buyer2LastName = propertyUpdateSummary.Buyer2LastName;
+            property.Buyer2PhoneNumber = propertyUpdateSummary.Buyer2PhoneNumber;
+
+            property.OriginalOwnerEmail = propertyUpdateSummary.OriginalOwnerEmail;
+            property.OriginalOwnerFirstName = propertyUpdateSummary.OriginalOwnerFirstName;
+            property.OriginalOwnerLastName = propertyUpdateSummary.OriginalOwnerLastName;
+            property.OriginalOwnerPhoneNumber = propertyUpdateSummary.OriginalOwnerPhoneNumber;
+
+            
+            property.UpdatedAt = DateTime.Now;
+
+            _context.Property.Update(property);
+            var rowsAffected = _context.SaveChanges();
+
+            return rowsAffected > 0;
         }
 
         public IEnumerable<RealEstateProperty> GetAllProperties()

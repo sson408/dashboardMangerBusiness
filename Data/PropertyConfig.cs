@@ -77,17 +77,8 @@ namespace dashboardManger.Data
             builder.Property(p => p.ImageUrl)
                 .HasMaxLength(2048);
     
-            builder.Property(p => p.ListingPrice)
-                .HasMaxLength(256);
-
             builder.Property(p => p.SoldPrice)
                 .HasColumnType("decimal(18,2)");
-
-            builder.Property(p => p.FloorArea)
-                .HasColumnType("float"); 
-
-            builder.Property(p => p.TotalArea)
-                .HasColumnType("float");
 
             builder.Property(p => p.CreatedAt)
                 .IsRequired()

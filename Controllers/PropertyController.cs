@@ -124,6 +124,18 @@ namespace dashboardManger.Controllers
             }
         }
 
+        [HttpPost("setSold")]
+        public ActionResult SetSold([FromBody] PropertyUpdateSummary propertyUpdateSummary)
+        {
+            var success = _propertyService.SetSold(propertyUpdateSummary);
+            if (!success)
+            {
+                return BadRequest(new ApiResponse<string>(400, "Property not updated", null));
+            }
+            return Ok(new ApiResponse<bool>(200, "Property updated successfully", success));
+        }
+
+
         [HttpPost("listAll")]
         public ActionResult<List<PropertyDTOSummary>> ListAll([FromBody] PropertySearchSummary searchSummary, [FromQuery] int pageNum = 1, int pageSize = 10)
         {
